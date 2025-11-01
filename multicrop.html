@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MultiCrop Preview - AI-Powered Social Media Image Cropping</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --info-color: #2196f3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 50px;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .hero-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .hero-image {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Header */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: var(--primary-color);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #45a049;
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #0b7dda;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #e68900;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .upload-text h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .upload-text p {
+            color: var(--gray-color);
+            margin-bottom: 15px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* AI Features Section */
+        .ai-features-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .ai-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .ai-feature-card {
+            background: linear-gradient(135deg, #f5f7fa, #e9ecef);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+
+        .ai-feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .ai-feature-icon {
+            font-size: 40px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .ai-feature-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .ai-feature-description {
+            font-size: 14px;
+            color: var(--gray-color);
+            margin-bottom: 15px;
+        }
+
+        .ai-feature-btn {
+            margin-top: 10px;
+        }
+
+        /* Preview Section */
+        .preview-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .platform-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .platform-header {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .platform-icon {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .instagram-icon {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+
+        .youtube-icon {
+            background-color: #FF0000;
+        }
+
+        .linkedin-icon {
+            background-color: #0077B5;
+        }
+
+        .twitter-icon {
+            background-color: #1DA1F2;
+        }
+
+        .facebook-icon {
+            background-color: #1877F2;
+        }
+
+        .pinterest-icon {
+            background-color: #E60023;
+        }
+
+        .tiktok-icon {
+            background-color: #000000;
+        }
+
+        .platform-info {
+            flex: 1;
+        }
+
+        .platform-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .platform-ratio {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+
+        .platform-canvas-container {
+            position: relative;
+            width: 100%;
+            padding-top: 100%; /* 1:1 Aspect Ratio */
+            background-color: #f5f5f5;
+            overflow: hidden;
+        }
+
+        .platform-canvas-container.aspect-16-9 {
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+
+        .platform-canvas-container.aspect-4-5 {
+            padding-top: 125%; /* 4:5 Aspect Ratio */
+        }
+
+        .platform-canvas-container.aspect-9-16 {
+            padding-top: 177.78%; /* 9:16 Aspect Ratio */
+        }
+
+        .platform-canvas-container.aspect-2-1 {
+            padding-top: 50%; /* 2:1 Aspect Ratio */
+        }
+
+        .platform-canvas-container.aspect-1-2 {
+            padding-top: 200%; /* 1:2 Aspect Ratio */
+        }
+
+        .platform-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .platform-controls {
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .platform-control-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background-color: #f0f0f0;
+            color: var(--dark-color);
+        }
+
+        .platform-control-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .platform-control-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .platform-actions {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .platform-download {
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .platform-download:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Export Section */
+        .export-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .export-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .export-card {
+            flex: 1;
+            min-width: 250px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .export-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .export-icon {
+            font-size: 36px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .export-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .export-description {
+            font-size: 14px;
+            color: var(--gray-color);
+            margin-bottom: 15px;
+        }
+
+        /* Features Section */
+        .features-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-icon {
+            font-size: 36px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .feature-description {
+            font-size: 14px;
+            color: var(--gray-color);
+        }
+
+        /* Templates Section */
+        .templates-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .template-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .template-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .template-info {
+            padding: 15px;
+        }
+
+        .template-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .template-platforms {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+
+        /* Ads Section */
+        .ads-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .ad-placeholder {
+            background-color: #f5f5f5;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px;
+            color: var(--gray-color);
+        }
+
+        /* Affiliate Section */
+        .affiliate-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .affiliate-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .affiliate-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .affiliate-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--dark-color);
+            transition: all 0.3s ease;
+        }
+
+        .affiliate-link:hover {
+            background-color: #eee;
+            transform: translateY(-2px);
+        }
+
+        .affiliate-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--dark-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background-color: var(--success-color);
+        }
+
+        .toast.error {
+            background-color: var(--danger-color);
+        }
+
+        .toast.info {
+            background-color: var(--info-color);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Color Picker */
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .color-label {
+            font-size: 14px;
+            color: var(--gray-color);
+        }
+
+        /* Custom Aspect Ratio Input */
+        .custom-aspect-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .custom-aspect-input {
+            width: 50px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        /* Filters Panel */
+        .filters-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #ddd;
+            background-color: white;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Collaboration Panel */
+        .collaboration-panel {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .collaboration-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .user-status {
+            font-size: 12px;
+            color: var(--success-color);
+        }
+
+        /* Download Progress */
+        .download-progress {
+            width: 100%;
+            height: 6px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .download-progress-bar {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 36px;
+            }
+            
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .platform-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+
+            .export-options {
+                flex-direction: column;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title">AI-Powered Social Media Image Cropping</h1>
+                    <p class="hero-subtitle">Preview and crop your images for all social media platforms simultaneously with AI assistance</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" id="heroUploadBtn">
+                            <i class="fas fa-upload"></i> Upload Image Now
+                        </button>
+                        <button class="btn btn-outline" id="heroFeaturesBtn">
+                            <i class="fas fa-magic"></i> Explore AI Features
+                        </button>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://picsum.photos/seed/socialmedia/600/400.jpg" alt="Social Media Preview">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-crop-alt"></i>
+                <h1>MultiCrop Preview</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button class="btn btn-primary" id="aboutBtn">
+                    <i class="fas fa-info-circle"></i> About
+                </button>
+            </div>
+        </div>
+    </header>
+ <center>
+  <div style="
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Arial, sans-serif;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: transparent;
+    background: linear-gradient(45deg, #1e90ff, #00bfff, #87ceeb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow: 0 0 10px rgba(30, 144, 255, 0.5);
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 9999;
+    user-select: none;
+    white-space: nowrap;
+    animation: pulse 3s ease-in-out infinite;
+    transition: all 0.5s ease;
+  " onmouseover="this.style.transform='translate(-50%, -50%) scale(1.05) rotate(1deg)'; this.style.opacity='0.25'" onmouseout="this.style.transform='translate(-50%, -50%) scale(1) rotate(0deg)'; this.style.opacity='0.15'">
+    Made By https://t.me/Sudais_alam
+  </div>
+</center>
+    <div class="container">
+        <!-- AI Features Section -->
+        <section class="ai-features-section">
+            <h2 class="section-title">
+                <i class="fas fa-brain"></i> AI-Powered Features
+            </h2>
+            <div class="ai-features-grid">
+                <div class="ai-feature-card">
+                    <div class="ai-feature-icon">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <h3 class="ai-feature-title">Smart Auto-Crop</h3>
+                    <p class="ai-feature-description">AI detects subjects and automatically crops to keep them in safe zones</p>
+                    <button class="btn btn-primary ai-feature-btn" id="autoCropBtn">
+                        <i class="fas fa-play"></i> Try Now
+                    </button>
+                </div>
+                <div class="ai-feature-card">
+                    <div class="ai-feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="ai-feature-title">Real-time Collaboration</h3>
+                    <p class="ai-feature-description">Work with your team in real-time on the same image</p>
+                    <button class="btn btn-primary ai-feature-btn" id="collaborationBtn">
+                        <i class="fas fa-plus"></i> Invite Team
+                    </button>
+                </div>
+                <div class="ai-feature-card">
+                    <div class="ai-feature-icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h3 class="ai-feature-title">Advanced Filters</h3>
+                    <p class="ai-feature-description">Apply professional filters and effects to enhance your images</p>
+                    <button class="btn btn-primary ai-feature-btn" id="filtersBtn">
+                        <i class="fas fa-palette"></i> Apply Filters
+                    </button>
+                </div>
+                <div class="ai-feature-card">
+                    <div class="ai-feature-icon">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </div>
+                    <h3 class="ai-feature-title">Custom Aspect Ratios</h3>
+                    <p class="ai-feature-description">Create and save your own custom aspect ratios for any platform</p>
+                    <button class="btn btn-primary ai-feature-btn" id="customRatioBtn">
+                        <i class="fas fa-plus"></i> Create Ratio
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upload Section -->
+        <section class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-text">
+                    <h3>Upload Your Image</h3>
+                    <p>Drag & drop your image here or click to browse</p>
+                    <button class="btn btn-primary">Select Image</button>
+                </div>
+                <input type="file" class="file-input" id="fileInput" accept="image/*">
+            </div>
+        </section>
+
+        <!-- Preview Section -->
+        <section class="preview-section" id="previewSection" style="display: none;">
+            <h2 class="section-title">
+                <i class="fas fa-eye"></i> Platform Previews
+            </h2>
+            <div class="platform-grid" id="platformGrid">
+                <!-- Platform cards will be dynamically generated here -->
+            </div>
+        </section>
+
+        <!-- Export Section -->
+        <section class="export-section" id="exportSection" style="display: none;">
+            <h2 class="section-title">
+                <i class="fas fa-download"></i> Export Options
+            </h2>
+            <div class="export-options">
+                <div class="export-card">
+                    <div class="export-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <h3 class="export-title">Single Download</h3>
+                    <p class="export-description">Download a single platform version</p>
+                    <button class="btn btn-primary" id="singleDownloadBtn">Download</button>
+                </div>
+                <div class="export-card">
+                    <div class="export-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3 class="export-title">Batch Export</h3>
+                    <p class="export-description">Export all platform versions at once</p>
+                    <button class="btn btn-success" id="batchDownloadBtn">Export All</button>
+                </div>
+                <div class="export-card">
+                    <div class="export-icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h3 class="export-title">Custom Settings</h3>
+                    <p class="export-description">Adjust quality, format, and resolution</p>
+                    <button class="btn btn-info" id="customSettingsBtn">Customize</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <h2 class="section-title">
+                <i class="fas fa-star"></i> Features
+            </h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-crop-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Multi-Platform Preview</h3>
+                    <p class="feature-description">See how your image looks on all platforms at once</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Safe Zones</h3>
+                    <p class="feature-description">Visual guides for important content placement</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3 class="feature-title">Free Downloads</h3>
+                    <p class="feature-description">Download all platform versions for free</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3 class="feature-title">Batch Export</h3>
+                    <p class="feature-description">Export all versions at once with one click</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3 class="feature-title">Background Colors</h3>
+                    <p class="feature-description">Change background color for transparent images</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-th"></i>
+                    </div>
+                    <h3 class="feature-title">Grid Overlay</h3>
+                    <p class="feature-description">Toggle grid lines for better composition</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Templates Section -->
+        <section class="templates-section">
+            <h2 class="section-title">
+                <i class="fas fa-clone"></i> Templates
+            </h2>
+            <div class="templates-grid">
+                <div class="template-card" data-template="quote">
+                    <img src="https://picsum.photos/seed/quote/200/120.jpg" alt="Quote Template" class="template-image">
+                    <div class="template-info">
+                        <h3 class="template-name">Quote Post</h3>
+                        <p class="template-platforms">Instagram, Facebook, Twitter</p>
+                    </div>
+                </div>
+                <div class="template-card" data-template="product">
+                    <img src="https://picsum.photos/seed/product/200/120.jpg" alt="Product Template" class="template-image">
+                    <div class="template-info">
+                        <h3 class="template-name">Product Showcase</h3>
+                        <p class="template-platforms">Instagram, Facebook, Pinterest</p>
+                    </div>
+                </div>
+                <div class="template-card" data-template="event">
+                    <img src="https://picsum.photos/seed/event/200/120.jpg" alt="Event Template" class="template-image">
+                    <div class="template-info">
+                        <h3 class="template-name">Event Announcement</h3>
+                        <p class="template-platforms">Facebook, Instagram, LinkedIn</p>
+                    </div>
+                </div>
+                <div class="template-card" data-template="blog">
+                    <img src="https://picsum.photos/seed/blog/200/120.jpg" alt="Blog Template" class="template-image">
+                    <div class="template-info">
+                        <h3 class="template-name">Blog Post</h3>
+                        <p class="template-platforms">LinkedIn, Twitter, Facebook</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ads Section -->
+        <section class="ads-section">
+            <h2 class="section-title">
+                <i class="fas fa-ad"></i> Sponsored
+            </h2>
+            <div class="ad-placeholder">
+                <i class="fas fa-ad" style="font-size: 24px; margin-bottom: 10px;"></i>
+                <p>AdSense Ad Space</p>
+            </div>
+        </section>
+
+       
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#" class="footer-link">About</a>
+                <a href="#" class="footer-link">Privacy</a>
+                <a href="#" class="footer-link">Terms</a>
+                <a href="#" class="footer-link">Contact</a>
+            </div>
+            <p>&copy; 2023 MultiCrop Preview. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal" id="aboutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">About MultiCrop Preview</h3>
+                <button class="modal-close" id="closeAboutModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>MultiCrop Preview is a free tool that allows content creators, social media managers, and designers to preview their images in different aspect ratios for various social media platforms.</p>
+                <p>With our tool, you can:</p>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li>Upload an image and see how it looks on all platforms at once</li>
+                    <li>Visualize safe zones for important content</li>
+                    <li>Download individual platform versions</li>
+                    <li>Export all versions at once with batch export</li>
+                    <li>Customize background colors for transparent images</li>
+                    <li>Toggle grid overlays for better composition</li>
+                    <li>Use AI-powered features for smart cropping</li>
+                    <li>Collaborate with your team in real-time</li>
+                    <li>Apply professional filters and effects</li>
+                    <li>Create custom aspect ratios</li>
+                </ul>
+                <p>All features are completely free to use!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="closeAboutModal2">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto Crop Modal -->
+    <div class="modal" id="autoCropModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">AI Auto-Crop</h3>
+                <button class="modal-close" id="closeAutoCropModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Our AI will automatically detect the main subject in your image and crop it to fit each platform's aspect ratio while keeping the subject in the safe zone.</p>
+                <div style="text-align: center; margin: 20px 0;">
+                    <div class="loading-spinner"></div>
+                    <p style="margin-top: 10px;">Analyzing image...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelAutoCrop">Cancel</button>
+                <button class="btn btn-primary" id="applyAutoCrop">Apply Auto-Crop</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collaboration Modal -->
+    <div class="modal" id="collaborationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Real-time Collaboration</h3>
+                <button class="modal-close" id="closeCollaborationModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Invite team members to collaborate on this image in real-time. Changes will be synchronized across all devices.</p>
+                <div style="margin: 20px 0;">
+                    <input type="email" placeholder="Enter email address" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px;">
+                    <button class="btn btn-primary" style="width: 100%;">Send Invitation</button>
+                </div>
+                <div class="collaboration-panel">
+                    <h4 style="margin-bottom: 15px;">Active Collaborators</h4>
+                    <div class="collaboration-user">
+                        <div class="user-avatar">Y</div>
+                        <div>
+                            <div class="user-name">You</div>
+                            <div class="user-status">Owner</div>
+                        </div>
+                    </div>
+                    <div class="collaboration-user">
+                        <div class="user-avatar" style="background-color: var(--info-color);">A</div>
+                        <div>
+                            <div class="user-name">Alex Johnson</div>
+                            <div class="user-status">Editing</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="closeCollaborationModal2">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Modal -->
+    <div class="modal" id="filtersModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Advanced Filters & Effects</h3>
+                <button class="modal-close" id="closeFiltersModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Apply professional filters and effects to enhance your image before exporting.</p>
+                <div class="filters-panel">
+                    <button class="filter-btn active">Original</button>
+                    <button class="filter-btn">Vivid</button>
+                    <button class="filter-btn">Black & White</button>
+                    <button class="filter-btn">Sepia</button>
+                    <button class="filter-btn">Cool</button>
+                    <button class="filter-btn">Warm</button>
+                    <button class="filter-btn">Dramatic</button>
+                    <button class="filter-btn">Vintage</button>
+                    <button class="filter-btn">Clarity</button>
+                    <button class="filter-btn">Fade</button>
+                </div>
+                <div style="margin-top: 20px;">
+                    <label style="display: block; margin-bottom: 5px;">Intensity</label>
+                    <input type="range" min="0" max="100" value="50" style="width: 100%;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelFilters">Cancel</button>
+                <button class="btn btn-primary" id="applyFilters">Apply Filter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Ratio Modal -->
+    <div class="modal" id="customRatioModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Create Custom Aspect Ratio</h3>
+                <button class="modal-close" id="closeCustomRatioModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Create your own custom aspect ratio for any platform or use case.</p>
+                <div style="margin: 20px 0;">
+                    <label style="display: block; margin-bottom: 10px;">Aspect Ratio</label>
+                    <div class="custom-aspect-container">
+                        <input type="number" class="custom-aspect-input" value="16" min="1" max="100">
+                        <span>:</span>
+                        <input type="number" class="custom-aspect-input" value="9" min="1" max="100">
+                    </div>
+                </div>
+                <div style="margin: 20px 0;">
+                    <label style="display: block; margin-bottom: 10px;">Name</label>
+                    <input type="text" placeholder="e.g., Custom Banner" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="margin: 20px 0;">
+                    <label style="display: block; margin-bottom: 10px;">Safe Zone</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label style="font-size: 12px;">Top</label>
+                            <input type="range" min="0" max="50" value="10" style="width: 100%;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px;">Bottom</label>
+                            <input type="range" min="0" max="50" value="10" style="width: 100%;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px;">Left</label>
+                            <input type="range" min="0" max="50" value="10" style="width: 100%;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px;">Right</label>
+                            <input type="range" min="0" max="50" value="10" style="width: 100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelCustomRatio">Cancel</button>
+                <button class="btn btn-primary" id="saveCustomRatio">Save Ratio</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Platform configurations
+            const platforms = [
+                {
+                    name: 'Instagram Post',
+                    icon: 'instagram',
+                    iconClass: 'instagram-icon',
+                    ratio: '1:1',
+                    aspectRatio: 1,
+                    canvasClass: 'aspect-1-1',
+                    safeZone: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 }
+                },
+                {
+                    name: 'Instagram Portrait',
+                    icon: 'instagram',
+                    iconClass: 'instagram-icon',
+                    ratio: '4:5',
+                    aspectRatio: 0.8,
+                    canvasClass: 'aspect-4-5',
+                    safeZone: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 }
+                },
+                {
+                    name: 'Instagram Story',
+                    icon: 'instagram',
+                    iconClass: 'instagram-icon',
+                    ratio: '9:16',
+                    aspectRatio: 9/16,
+                    canvasClass: 'aspect-9-16',
+                    safeZone: { top: 0.15, right: 0.1, bottom: 0.15, left: 0.1 }
+                },
+                {
+                    name: 'YouTube Thumbnail',
+                    icon: 'youtube',
+                    iconClass: 'youtube-icon',
+                    ratio: '16:9',
+                    aspectRatio: 16/9,
+                    canvasClass: 'aspect-16-9',
+                    safeZone: { top: 0.15, right: 0.15, bottom: 0.15, left: 0.15 }
+                },
+                {
+                    name: 'LinkedIn Post',
+                    icon: 'linkedin',
+                    iconClass: 'linkedin-icon',
+                    ratio: '1.91:1',
+                    aspectRatio: 1/1.91,
+                    canvasClass: 'aspect-16-9',
+                    safeZone: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 }
+                },
+                {
+                    name: 'Twitter Post',
+                    icon: 'twitter',
+                    iconClass: 'twitter-icon',
+                    ratio: '16:9',
+                    aspectRatio: 16/9,
+                    canvasClass: 'aspect-16-9',
+                    safeZone: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 }
+                },
+                {
+                    name: 'Twitter Header',
+                    icon: 'twitter',
+                    iconClass: 'twitter-icon',
+                    ratio: '2:1',
+                    aspectRatio: 0.5,
+                    canvasClass: 'aspect-2-1',
+                    safeZone: { top: 0.15, right: 0.15, bottom: 0.15, left: 0.15 }
+                },
+                {
+                    name: 'Facebook Post',
+                    icon: 'facebook',
+                    iconClass: 'facebook-icon',
+                    ratio: '1.91:1',
+                    aspectRatio: 1/1.91,
+                    canvasClass: 'aspect-16-9',
+                    safeZone: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 }
+                },
+                {
+                    name: 'Pinterest Pin',
+                    icon: 'pinterest',
+                    iconClass: 'pinterest-icon',
+                    ratio: '1:2',
+                    aspectRatio: 0.5,
+                    canvasClass: 'aspect-1-2',
+                    safeZone: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 }
+                },
+                {
+                    name: 'TikTok Video',
+                    icon: 'tiktok',
+                    iconClass: 'tiktok-icon',
+                    ratio: '9:16',
+                    aspectRatio: 9/16,
+                    canvasClass: 'aspect-9-16',
+                    safeZone: { top: 0.15, right: 0.1, bottom: 0.15, left: 0.1 }
+                }
+            ];
+
+            // DOM elements
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const previewSection = document.getElementById('previewSection');
+            const platformGrid = document.getElementById('platformGrid');
+            const exportSection = document.getElementById('exportSection');
+            const resetBtn = document.getElementById('resetBtn');
+            const aboutBtn = document.getElementById('aboutBtn');
+            const heroUploadBtn = document.getElementById('heroUploadBtn');
+            const heroFeaturesBtn = document.getElementById('heroFeaturesBtn');
+            const singleDownloadBtn = document.getElementById('singleDownloadBtn');
+            const batchDownloadBtn = document.getElementById('batchDownloadBtn');
+            const customSettingsBtn = document.getElementById('customSettingsBtn');
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            // AI Feature buttons
+            const autoCropBtn = document.getElementById('autoCropBtn');
+            const collaborationBtn = document.getElementById('collaborationBtn');
+            const filtersBtn = document.getElementById('filtersBtn');
+            const customRatioBtn = document.getElementById('customRatioBtn');
+            
+            // Modals
+            const aboutModal = document.getElementById('aboutModal');
+            const autoCropModal = document.getElementById('autoCropModal');
+            const collaborationModal = document.getElementById('collaborationModal');
+            const filtersModal = document.getElementById('filtersModal');
+            const customRatioModal = document.getElementById('customRatioModal');
+            
+            // Modal close buttons
+            const closeAboutModal = document.getElementById('closeAboutModal');
+            const closeAboutModal2 = document.getElementById('closeAboutModal2');
+            const closeAutoCropModal = document.getElementById('closeAutoCropModal');
+            const closeCollaborationModal = document.getElementById('closeCollaborationModal');
+            const closeCollaborationModal2 = document.getElementById('closeCollaborationModal2');
+            const closeFiltersModal = document.getElementById('closeFiltersModal');
+            const closeCustomRatioModal = document.getElementById('closeCustomRatioModal');
+            
+            // Modal action buttons
+            const cancelAutoCrop = document.getElementById('cancelAutoCrop');
+            const applyAutoCrop = document.getElementById('applyAutoCrop');
+            const cancelFilters = document.getElementById('cancelFilters');
+            const applyFilters = document.getElementById('applyFilters');
+            const cancelCustomRatio = document.getElementById('cancelCustomRatio');
+            const saveCustomRatio = document.getElementById('saveCustomRatio');
+
+            // State
+            let uploadedImage = null;
+            let selectedPlatform = null;
+            let platformStates = {};
+            let currentFilter = 'Original';
+            let filterIntensity = 50;
+
+            // Initialize platform states
+            platforms.forEach((platform, index) => {
+                platformStates[index] = {
+                    showGrid: false,
+                    showSafeZone: true,
+                    backgroundColor: '#ffffff',
+                    cropOffsetX: 0,
+                    cropOffsetY: 0,
+                    cropScale: 1
+                };
+            });
+
+            // Event listeners
+            uploadArea.addEventListener('click', () => fileInput.click());
+            heroUploadBtn.addEventListener('click', () => fileInput.click());
+            heroFeaturesBtn.addEventListener('click', () => {
+                document.querySelector('.ai-features-section').scrollIntoView({ behavior: 'smooth' });
+            });
+            fileInput.addEventListener('change', handleFileSelect);
+            resetBtn.addEventListener('click', resetApp);
+            aboutBtn.addEventListener('click', () => showModal(aboutModal));
+            closeAboutModal.addEventListener('click', () => hideModal(aboutModal));
+            closeAboutModal2.addEventListener('click', () => hideModal(aboutModal));
+            singleDownloadBtn.addEventListener('click', handleSingleDownload);
+            batchDownloadBtn.addEventListener('click', handleBatchDownload);
+            customSettingsBtn.addEventListener('click', handleCustomSettings);
+            
+            // AI Feature event listeners
+            autoCropBtn.addEventListener('click', () => showModal(autoCropModal));
+            collaborationBtn.addEventListener('click', () => showModal(collaborationModal));
+            filtersBtn.addEventListener('click', () => showModal(filtersModal));
+            customRatioBtn.addEventListener('click', () => showModal(customRatioModal));
+            
+            // Modal close event listeners
+            closeAutoCropModal.addEventListener('click', () => hideModal(autoCropModal));
+            closeCollaborationModal.addEventListener('click', () => hideModal(collaborationModal));
+            closeCollaborationModal2.addEventListener('click', () => hideModal(collaborationModal));
+            closeFiltersModal.addEventListener('click', () => hideModal(filtersModal));
+            closeCustomRatioModal.addEventListener('click', () => hideModal(customRatioModal));
+            
+            // Modal action event listeners
+            cancelAutoCrop.addEventListener('click', () => hideModal(autoCropModal));
+            applyAutoCrop.addEventListener('click', handleAutoCrop);
+            cancelFilters.addEventListener('click', () => hideModal(filtersModal));
+            applyFilters.addEventListener('click', handleApplyFilters);
+            cancelCustomRatio.addEventListener('click', () => hideModal(customRatioModal));
+            saveCustomRatio.addEventListener('click', handleSaveCustomRatio);
+
+            // Template cards
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const template = this.getAttribute('data-template');
+                    showToast(`Applying ${template} template`, 'info');
+                    // In a real app, this would apply a template to the image
+                });
+            });
+
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.textContent;
+                });
+            });
+
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+
+            // Functions
+            function handleFileSelect(e) {
+                if (e.target.files.length) {
+                    handleFile(e.target.files[0]);
+                }
+            }
+
+            function handleFile(file) {
+                if (!file.type.match('image.*')) {
+                    showToast('Please select an image file', 'error');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImage = new Image();
+                    uploadedImage.onload = function() {
+                        generatePreviews();
+                        previewSection.style.display = 'block';
+                        exportSection.style.display = 'block';
+                        showToast('Image uploaded successfully', 'success');
+                    };
+                    uploadedImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function generatePreviews() {
+                platformGrid.innerHTML = '';
+                
+                platforms.forEach((platform, index) => {
+                    const platformCard = document.createElement('div');
+                    platformCard.className = 'platform-card';
+                    
+                    platformCard.innerHTML = `
+                        <div class="platform-header">
+                            <div class="platform-icon ${platform.iconClass}">
+                                <i class="fab fa-${platform.icon}"></i>
+                            </div>
+                            <div class="platform-info">
+                                <div class="platform-name">${platform.name}</div>
+                                <div class="platform-ratio">${platform.ratio}</div>
+                            </div>
+                        </div>
+                        <div class="platform-canvas-container ${platform.canvasClass}">
+                            <canvas class="platform-canvas" id="canvas-${index}"></canvas>
+                        </div>
+                        <div class="platform-controls">
+                            <button class="platform-control-btn grid-toggle" data-index="${index}">
+                                <i class="fas fa-th"></i> Grid
+                            </button>
+                            <button class="platform-control-btn safe-zone-toggle active" data-index="${index}">
+                                <i class="fas fa-shield-alt"></i> Safe Zone
+                            </button>
+                            <div class="color-picker-container">
+                                <input type="color" class="color-picker" id="color-${index}" value="#ffffff">
+                                <span class="color-label">Background</span>
+                            </div>
+                        </div>
+                        <div class="platform-actions">
+                            <div class="platform-download" data-index="${index}">
+                                <i class="fas fa-download"></i> Download
+                            </div>
+                        </div>
+                    `;
+                    
+                    platformGrid.appendChild(platformCard);
+                    
+                    // Draw the image on the canvas
+                    const canvas = document.getElementById(`canvas-${index}`);
+                    
+                    // Wait for the card to be added to the DOM before drawing
+                    setTimeout(() => {
+                        drawImageOnCanvas(canvas, platform, index);
+                    }, 100);
+                    
+                    // Add event listeners
+                    const gridToggle = platformCard.querySelector('.grid-toggle');
+                    const safeZoneToggle = platformCard.querySelector('.safe-zone-toggle');
+                    const colorPicker = platformCard.querySelector('.color-picker');
+                    const downloadBtn = platformCard.querySelector('.platform-download');
+                    
+                    gridToggle.addEventListener('click', () => {
+                        platformStates[index].showGrid = !platformStates[index].showGrid;
+                        gridToggle.classList.toggle('active');
+                        drawImageOnCanvas(canvas, platform, index);
+                    });
+                    
+                    safeZoneToggle.addEventListener('click', () => {
+                        platformStates[index].showSafeZone = !platformStates[index].showSafeZone;
+                        safeZoneToggle.classList.toggle('active');
+                        drawImageOnCanvas(canvas, platform, index);
+                    });
+                    
+                    colorPicker.addEventListener('change', (e) => {
+                        platformStates[index].backgroundColor = e.target.value;
+                        drawImageOnCanvas(canvas, platform, index);
+                    });
+                    
+                    downloadBtn.addEventListener('click', () => {
+                        selectedPlatform = index;
+                        handleSingleDownload();
+                    });
+                });
+            }
+
+            function drawImageOnCanvas(canvas, platform, index) {
+                const ctx = canvas.getContext('2d');
+                const container = canvas.parentElement;
+                const state = platformStates[index];
+                
+                // Set canvas dimensions
+                canvas.width = container.offsetWidth;
+                canvas.height = container.offsetHeight;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Fill background
+                ctx.fillStyle = state.backgroundColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Calculate scaling and positioning to fit the image in the canvas
+                const imgRatio = uploadedImage.width / uploadedImage.height;
+                const canvasRatio = canvas.width / canvas.height;
+                
+                let drawWidth, drawHeight, offsetX, offsetY;
+                
+                if (imgRatio > canvasRatio) {
+                    // Image is wider than canvas
+                    drawHeight = canvas.height;
+                    drawWidth = drawHeight * imgRatio;
+                    offsetX = (canvas.width - drawWidth) / 2;
+                    offsetY = 0;
+                } else {
+                    // Image is taller than canvas
+                    drawWidth = canvas.width;
+                    drawHeight = drawWidth / imgRatio;
+                    offsetX = 0;
+                    offsetY = (canvas.height - drawHeight) / 2;
+                }
+                
+                // Apply crop offset and scale
+                offsetX += state.cropOffsetX;
+                offsetY += state.cropOffsetY;
+                drawWidth *= state.cropScale;
+                drawHeight *= state.cropScale;
+                
+                // Apply filter if needed
+                ctx.filter = getCanvasFilter();
+                
+                // Draw the image
+                ctx.drawImage(uploadedImage, offsetX, offsetY, drawWidth, drawHeight);
+                
+                // Reset filter
+                ctx.filter = 'none';
+                
+                // Draw safe zone if enabled
+                if (state.showSafeZone) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    
+                    const safeZone = platform.safeZone;
+                    const safeZoneX = canvas.width * safeZone.left;
+                    const safeZoneY = canvas.height * safeZone.top;
+                    const safeZoneWidth = canvas.width * (1 - safeZone.left - safeZone.right);
+                    const safeZoneHeight = canvas.height * (1 - safeZone.top - safeZone.bottom);
+                    
+                    ctx.strokeRect(safeZoneX, safeZoneY, safeZoneWidth, safeZoneHeight);
+                    
+                    // Draw safe zone label
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.font = '12px Poppins';
+                    ctx.fillText('Safe Zone', safeZoneX + 5, safeZoneY + 15);
+                    
+                    // Reset line dash
+                    ctx.setLineDash([]);
+                }
+                
+                // Draw grid if enabled
+                if (state.showGrid) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([]);
+                    
+                    // Draw vertical lines
+                    for (let i = 1; i < 3; i++) {
+                        const x = (canvas.width / 3) * i;
+                        ctx.beginPath();
+                        ctx.moveTo(x, 0);
+                        ctx.lineTo(x, canvas.height);
+                        ctx.stroke();
+                    }
+                    
+                    // Draw horizontal lines
+                    for (let i = 1; i < 3; i++) {
+                        const y = (canvas.height / 3) * i;
+                        ctx.beginPath();
+                        ctx.moveTo(0, y);
+                        ctx.lineTo(canvas.width, y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            function getCanvasFilter() {
+                switch(currentFilter) {
+                    case 'Vivid':
+                        return `saturate(${150 + filterIntensity/2}%) contrast(${110 + filterIntensity/5}%)`;
+                    case 'Black & White':
+                        return `grayscale(100%)`;
+                    case 'Sepia':
+                        return `sepia(100%)`;
+                    case 'Cool':
+                        return `hue-rotate(180deg) saturate(${120 + filterIntensity/2}%)`;
+                    case 'Warm':
+                        return `hue-rotate(30deg) saturate(${120 + filterIntensity/2}%)`;
+                    case 'Dramatic':
+                        return `contrast(${150 + filterIntensity/2}%) brightness(${90 + filterIntensity/10}%)`;
+                    case 'Vintage':
+                        return `sepia(50%) contrast(${120 + filterIntensity/5}%) brightness(${90 + filterIntensity/10}%)`;
+                    case 'Clarity':
+                        return `contrast(${120 + filterIntensity/5}%) saturate(${110 + filterIntensity/10}%)`;
+                    case 'Fade':
+                        return `brightness(${110 + filterIntensity/10}%) saturate(${80 + filterIntensity/5}%)`;
+                    default:
+                        return 'none';
+                }
+            }
+
+            function handleSingleDownload() {
+                if (selectedPlatform === null) {
+                    showToast('Please select a platform to download', 'error');
+                    return;
+                }
+                
+                const platform = platforms[selectedPlatform];
+                const canvas = document.getElementById(`canvas-${selectedPlatform}`);
+                
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${platform.name.replace(/\s+/g, '_')}_${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showToast(`${platform.name} downloaded successfully`, 'success');
+                });
+            }
+
+            function handleBatchDownload() {
+                if (!uploadedImage) {
+                    showToast('Please upload an image first', 'error');
+                    return;
+                }
+                
+                showToast('Preparing batch download...', 'info');
+                
+                // Create a new JSZip instance
+                const zip = new JSZip();
+                
+                // Add each platform canvas to the zip
+                const promises = platforms.map((platform, index) => {
+                    return new Promise((resolve) => {
+                        const canvas = document.getElementById(`canvas-${index}`);
+                        canvas.toBlob((blob) => {
+                            zip.file(`${platform.name.replace(/\s+/g, '_')}.png`, blob);
+                            resolve();
+                        });
+                    });
+                });
+                
+                // When all files are added, generate the zip
+                Promise.all(promises).then(() => {
+                    zip.generateAsync({type: 'blob'}).then((content) => {
+                        // Create a download link for the zip file
+                        const url = URL.createObjectURL(content);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `MultiCrop_Export_${Date.now()}.zip`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        showToast('Batch download completed successfully', 'success');
+                    });
+                });
+            }
+
+            function handleCustomSettings() {
+                showToast('Custom settings panel opened', 'info');
+                // In a real app, this would open a settings panel
+            }
+
+            function handleAutoCrop() {
+                hideModal(autoCropModal);
+                showToast('AI auto-crop applied successfully', 'success');
+                
+                // Simulate AI auto-crop by adjusting crop offsets and scales
+                platforms.forEach((platform, index) => {
+                    platformStates[index].cropOffsetX = (Math.random() - 0.5) * 50;
+                    platformStates[index].cropOffsetY = (Math.random() - 0.5) * 50;
+                    platformStates[index].cropScale = 0.9 + Math.random() * 0.2;
+                    
+                    const canvas = document.getElementById(`canvas-${index}`);
+                    drawImageOnCanvas(canvas, platform, index);
+                });
+            }
+
+            function handleApplyFilters() {
+                hideModal(filtersModal);
+                showToast(`${currentFilter} filter applied successfully`, 'success');
+                
+                // Redraw all canvases with the new filter
+                platforms.forEach((platform, index) => {
+                    const canvas = document.getElementById(`canvas-${index}`);
+                    drawImageOnCanvas(canvas, platform, index);
+                });
+            }
+
+            function handleSaveCustomRatio() {
+                hideModal(customRatioModal);
+                showToast('Custom aspect ratio saved successfully', 'success');
+                // In a real app, this would add the custom ratio to the platform list
+            }
+
+            function resetApp() {
+                uploadedImage = null;
+                selectedPlatform = null;
+                previewSection.style.display = 'none';
+                exportSection.style.display = 'none';
+                platformGrid.innerHTML = '';
+                fileInput.value = '';
+                currentFilter = 'Original';
+                filterIntensity = 50;
+                
+                // Reset platform states
+                platforms.forEach((platform, index) => {
+                    platformStates[index] = {
+                        showGrid: false,
+                        showSafeZone: true,
+                        backgroundColor: '#ffffff',
+                        cropOffsetX: 0,
+                        cropOffsetY: 0,
+                        cropScale: 1
+                    };
+                });
+                
+                showToast('App reset successfully', 'info');
+            }
+
+            function showToast(message, type = 'success') {
+                toastMessage.textContent = message;
+                toast.className = 'toast show';
+                
+                if (type === 'error') {
+                    toast.classList.add('error');
+                } else if (type === 'info') {
+                    toast.classList.add('info');
+                } else {
+                    toast.classList.add('success');
+                }
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+
+            function showModal(modal) {
+                modal.classList.add('show');
+            }
+
+            function hideModal(modal) {
+                modal.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
