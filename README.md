@@ -72,3 +72,6 @@ multi-crop-in-one/
 ## Credits
 
 Made by **Sudais Alam**.
+
+## Browser Support
+Chrome, Firefox, Safari, Edge — modern browser with Canvas API support.
